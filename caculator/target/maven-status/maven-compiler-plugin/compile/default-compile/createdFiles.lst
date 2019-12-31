@@ -1,0 +1,7 @@
+com\acme\caculator\caculator\AddOperationDelegate.class
+com\acme\caculator\caculator\MultipleOperationDelegate.class
+com\acme\caculator\caculator\DivideOperationDelegate.class
+com\acme\caculator\caculator\CamundaApplication.class
+com\acme\caculator\caculator\CreateUsersAndGroupsApplicationRunner.class
+com\acme\caculator\caculator\LoggerDelegate.class
+com\acme\caculator\caculator\MinusOperationDelegate.class

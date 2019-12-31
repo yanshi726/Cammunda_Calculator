@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1yklqby" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.5.0">
+  <bpmn:process id="Process_calculator" name="Calculator" isExecutable="true" camunda:versionTag="1.0.0">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>SequenceFlow_0mdtspi</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="EndEvent_1v9yehs">
+      <bpmn:incoming>SequenceFlow_0inin4e</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:userTask id="Task_EnterInputs_Operator" name="Enter Operator and Operand" camunda:assignee="Chelsea">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="OperandA" label="Enter Operand A" type="long" />
+          <camunda:formField id="OperandB" label="Enter Operand B" type="long" />
+          <camunda:formField id="Operator" label="Enter Operator Value(+, -, *, /)" type="string" defaultValue="+" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0mdtspi</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_09uex97</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_1qkbt9h" name="Show Results">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="result" type="long" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1c5zwfs</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_0o326z2</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1syj6n3</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_058vfkj</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0inin4e</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="Task_AddOperation" name="Add Operation" camunda:delegateExpression="#{AddOperation}">
+      <bpmn:incoming>SequenceFlow_AddOperation</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1c5zwfs</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0mdtspi" sourceRef="StartEvent_1" targetRef="Task_EnterInputs_Operator" />
+    <bpmn:sequenceFlow id="SequenceFlow_09uex97" sourceRef="Task_EnterInputs_Operator" targetRef="ExclusiveGateway_CheckOperator" />
+    <bpmn:sequenceFlow id="SequenceFlow_1c5zwfs" sourceRef="Task_AddOperation" targetRef="Task_1qkbt9h" />
+    <bpmn:sequenceFlow id="SequenceFlow_0inin4e" sourceRef="Task_1qkbt9h" targetRef="EndEvent_1v9yehs" />
+    <bpmn:exclusiveGateway id="ExclusiveGateway_CheckOperator" name="Check Operator">
+      <bpmn:incoming>SequenceFlow_09uex97</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_AddOperation</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_MinusOperation</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_MultipleOperation</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_DivideOperation</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_AddOperation" name="Add Operation" sourceRef="ExclusiveGateway_CheckOperator" targetRef="Task_AddOperation">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('Operator') =='+'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:serviceTask id="Task_MinusOperator" name="Minus Operator" camunda:delegateExpression="#{MinusOperation}">
+      <bpmn:incoming>SequenceFlow_MinusOperation</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0o326z2</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_MultipleOperator" name="Multiple Operator" camunda:delegateExpression="#{MultipleOperation}">
+      <bpmn:incoming>SequenceFlow_MultipleOperation</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1syj6n3</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_DivideOperator" name="Divide Operator" camunda:delegateExpression="#{DivideOperation}">
+      <bpmn:incoming>SequenceFlow_DivideOperation</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_058vfkj</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_MinusOperation" name="Minus Operation" sourceRef="ExclusiveGateway_CheckOperator" targetRef="Task_MinusOperator">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('Operator') =='-'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_MultipleOperation" name="Multiple Operation" sourceRef="ExclusiveGateway_CheckOperator" targetRef="Task_MultipleOperator">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('Operator') =='*'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_DivideOperation" name="Divide Operation" sourceRef="ExclusiveGateway_CheckOperator" targetRef="Task_DivideOperator">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('Operator') =='/'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0o326z2" sourceRef="Task_MinusOperator" targetRef="Task_1qkbt9h" />
+    <bpmn:sequenceFlow id="SequenceFlow_1syj6n3" sourceRef="Task_MultipleOperator" targetRef="Task_1qkbt9h" />
+    <bpmn:sequenceFlow id="SequenceFlow_058vfkj" sourceRef="Task_DivideOperator" targetRef="Task_1qkbt9h" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_calculator">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1v9yehs_di" bpmnElement="EndEvent_1v9yehs">
+        <dc:Bounds x="1152" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_1fai6v1_di" bpmnElement="Task_EnterInputs_Operator">
+        <dc:Bounds x="270" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_1hkiihh_di" bpmnElement="Task_1qkbt9h">
+        <dc:Bounds x="970" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_18ug733_di" bpmnElement="Task_AddOperation">
+        <dc:Bounds x="670" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0mdtspi_di" bpmnElement="SequenceFlow_0mdtspi">
+        <di:waypoint x="188" y="120" />
+        <di:waypoint x="270" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_09uex97_di" bpmnElement="SequenceFlow_09uex97">
+        <di:waypoint x="370" y="120" />
+        <di:waypoint x="485" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1c5zwfs_di" bpmnElement="SequenceFlow_1c5zwfs">
+        <di:waypoint x="770" y="120" />
+        <di:waypoint x="970" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0inin4e_di" bpmnElement="SequenceFlow_0inin4e">
+        <di:waypoint x="1070" y="120" />
+        <di:waypoint x="1152" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0gbl5wz_di" bpmnElement="ExclusiveGateway_CheckOperator" isMarkerVisible="true">
+        <dc:Bounds x="485" y="95" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="470" y="71" width="79" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1btusoh_di" bpmnElement="SequenceFlow_AddOperation">
+        <di:waypoint x="535" y="120" />
+        <di:waypoint x="670" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="568" y="102" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_13x6cxv_di" bpmnElement="Task_MinusOperator">
+        <dc:Bounds x="670" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0fwefcw_di" bpmnElement="Task_MultipleOperator">
+        <dc:Bounds x="670" y="360" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_07i6i0b_di" bpmnElement="Task_DivideOperator">
+        <dc:Bounds x="670" y="490" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0km9yvr_di" bpmnElement="SequenceFlow_MinusOperation">
+        <di:waypoint x="510" y="145" />
+        <di:waypoint x="510" y="250" />
+        <di:waypoint x="670" y="250" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="519" y="195" width="81" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1xcnlrt_di" bpmnElement="SequenceFlow_MultipleOperation">
+        <di:waypoint x="510" y="145" />
+        <di:waypoint x="510" y="400" />
+        <di:waypoint x="670" y="400" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="515" y="353" width="90" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0vsp1am_di" bpmnElement="SequenceFlow_DivideOperation">
+        <di:waypoint x="510" y="145" />
+        <di:waypoint x="510" y="530" />
+        <di:waypoint x="670" y="530" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="519" y="493" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0o326z2_di" bpmnElement="SequenceFlow_0o326z2">
+        <di:waypoint x="770" y="250" />
+        <di:waypoint x="980" y="250" />
+        <di:waypoint x="980" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1syj6n3_di" bpmnElement="SequenceFlow_1syj6n3">
+        <di:waypoint x="770" y="400" />
+        <di:waypoint x="1030" y="400" />
+        <di:waypoint x="1030" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_058vfkj_di" bpmnElement="SequenceFlow_058vfkj">
+        <di:waypoint x="770" y="530" />
+        <di:waypoint x="1060" y="530" />
+        <di:waypoint x="1060" y="160" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
